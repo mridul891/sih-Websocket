@@ -5,7 +5,26 @@ import cors from "cors";
 
 import { createClient } from "redis";
 import axios from "axios";
+import { database } from "./firebase.js";
+import { ref, set } from "firebase/database";
+import { NewsModel } from "./db.js";
+import mongoose from "mongoose";
 const app = express();
+
+const connectDb = async () => {
+  try {
+    console.log("Wait Connecting to the server");
+    const connectionInstance = await mongoose.connect(
+      "mongodb+srv://pandeymridulwork:mridul891@sih.w13n6.mongodb.net/?retryWrites=true&w=majority&appName=sih"
+    );
+    console.log(
+      `\n MongoDb Connected !! DB HOST : ${connectionInstance.connection.host}`
+    );
+  } catch (error) {
+    console.log("MongoDb Connection error", error);
+    process.exit(1);
+  }
+};
 
 const client = await createClient()
   .on("error", (err) => console.log("Redis Client Error", err))
@@ -31,19 +50,28 @@ io.on("connection", async (socket) => {
     const response = await axios.post("http://localhost:3001/analyze", {
       message: messages,
     });
+
     const res = await response.data;
-    if (res.input_analysis.confidence.method == "not_disaster_related"){
-      console.log("It is not a disaster")
-    }else{
-      console.log("It is an disaster")
+    console.log(res);
+    if (res.input_analysis.confidence.method == "not_disaster_related") {
+      console.log("It is not a disaster");
+    } else {
+      console.log("It is an disaster");
+      // add to the database
+      await NewsModel.create({
+        title: messages,
+        location: res.input_analysis.location[0] | "unknown",
+      });
     }
   });
 });
 
 app.get("/", (req, res) => {
-  res.json({ message: "The fucking server is started" });
+  res.json({ message: "The  server is started" });
 });
 
-server.listen(3000, () => {
-  console.log("server running at http://localhost:3000");
+connectDb().then(() => {
+  server.listen(3000, () => {
+    console.log("server running at http://localhost:3000");
+  });
 });
