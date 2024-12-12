@@ -58,9 +58,16 @@ io.on("connection", async (socket) => {
     } else {
       console.log("It is an disaster");
       // add to the database
+      const location  = await res.input_analysis.location[0] 
+      console.log(location)
       await NewsModel.create({
-        title: messages,
-        location: res.input_analysis.location[0] | "unknown",
+        news: messages,
+        location: location || "unknown",
+        disasterType: res.input_analysis.predicted_disaster.type || "",
+        link: "",
+        desc :messages ,
+        date: new Date(),
+        latest: true,
       });
     }
   });

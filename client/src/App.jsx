@@ -13,21 +13,21 @@ function App() {
     setMessage(" ");
   };
 
-  const webScrapperData = async () => {
-    console.log("Reached Here");
-    const response = await axios.get(
-      "https://webscrapper-bmoc.onrender.com/info"
-    );
-    const data = response.data;
+  // const webScrapperData = async () => {
+  //   console.log("Reached Here");
+  //   const response = await axios.get(
+  //     "https://webscrapper-bmoc.onrender.com/info"
+  //   );
+  //   const data = response.data;
 
-    data.map((elem) => {
-      const title = elem.title;
-      socket.emit("message", title);
-    });
-  };
-  useEffect(() => {
-    webScrapperData();
-  }, []);
+  //   data.map((elem) => {
+  //     const title = elem.title;
+  //     socket.emit("message", title);
+  //   });
+  // };
+  // useEffect(() => {
+  //   webScrapperData();
+  // }, []);
   return (
     <>
       <div className="w-[30vw] h-[40vh] mx-auto bg-black text-white border border-gray-700 rounded-lg shadow-lg p-4 space-y-4">
