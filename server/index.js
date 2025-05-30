@@ -47,25 +47,25 @@ io.on("connection", async (socket) => {
   socket.on("message", async (messages) => {
     console.log(messages);
 
-    const response = await axios.post("http://localhost:3001/analyze", {
+    const response = await axios.post("http://127.0.0.1:3000/analyze", {
       message: messages,
     });
-
+    console.log("reached 2 ");
     const res = await response.data;
     console.log(res);
-    if (res.input_analysis.confidence.method == "not_disaster_related") {
+    if (res.input_analysis.model_confidence < 0.3) {
       console.log("It is not a disaster");
     } else {
       console.log("It is an disaster");
       // add to the database
-      const location  = await res.input_analysis.location[0] 
-      console.log(location)
+      const location = await res.input_analysis.location;
+      console.log(location);
       await NewsModel.create({
         news: messages,
         location: location || "unknown",
         disasterType: res.input_analysis.predicted_disaster.type || "",
         link: "",
-        desc :messages ,
+        desc: messages,
         date: new Date(),
         latest: true,
       });
